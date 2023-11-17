@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id                   Int      @id @default(autoincrement())
+  nome                 String
+  email                String   @unique
+  leiloesComoDono      Leilao[] @relation("Dono")
+  leiloesComoComprador Leilao[] @relation("Comprador")
+  Lance                Lance[]
+}
+
+model Leilao {
+  id          Int      @id @default(autoincrement())
+  produto     String
+  preco       Float
+  dataLimite  DateTime
+  dono        Usuario  @relation("Dono", fields: [donoId], references: [id])
+  comprador   Usuario  @relation("Comprador", fields: [compradorId], references: [id])
+  donoId      Int
+  compradorId Int
+  listaLances Lance[]
+}
+
+model Lance {
+  id          Int     @id @default(autoincrement())
+  comprador   Usuario @relation(fields: [compradorId], references: [id])
+  compradorId Int
+  leilao      Leilao  @relation(fields: [leilaoId], references: [id])
+  leilaoId    Int
+  valor       Float
+}
